@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "OneGovFlow"
+description = "A premium GovTech platform for citizens to create one reusable digital profile, manage documents, discover eligible government services, and complete guided applications from a unified workspace."
+version = "1.0.0"
+id = "artifacts/onegovflow"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25646
+
+[services.development]
+run = "pnpm --filter @workspace/onegovflow run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/onegovflow", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/onegovflow/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25646"
+BASE_PATH = "/"

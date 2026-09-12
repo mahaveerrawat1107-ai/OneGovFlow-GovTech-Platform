@@ -10,6 +10,22 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Citizen dashboard summaries and activity
+  - name: profile
+    description: Citizen profile
+  - name: documents
+    description: Digital document vault
+  - name: services
+    description: Government service marketplace
+  - name: eligibility
+    description: Rule-based service eligibility
+  - name: applications
+    description: Guided application tracking
+  - name: demo
+    description: Judge demonstration controls
+  - name: admin
+    description: Officer dashboard
 paths:
   /healthz:
     get:
@@ -24,6 +40,186 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get citizen dashboard
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /activities:
+    get:
+      operationId: getActivities
+      tags: [dashboard]
+      summary: Get recent activity
+      responses:
+        "200":
+          description: Recent activity timeline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Activity"
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [profile]
+      summary: Get citizen profile
+      responses:
+        "200":
+          description: Citizen profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CitizenProfile"
+    patch:
+      operationId: updateProfile
+      tags: [profile]
+      summary: Update citizen profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated citizen profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CitizenProfile"
+  /documents:
+    get:
+      operationId: getDocuments
+      tags: [documents]
+      summary: List document vault items
+      responses:
+        "200":
+          description: Document vault
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Document"
+    post:
+      operationId: createDocument
+      tags: [documents]
+      summary: Add document metadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentInput"
+      responses:
+        "201":
+          description: Created document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+  /services:
+    get:
+      operationId: getServices
+      tags: [services]
+      summary: List government services
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Government service marketplace
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GovernmentService"
+  /eligibility:
+    get:
+      operationId: getEligibility
+      tags: [eligibility]
+      summary: Evaluate service eligibility
+      responses:
+        "200":
+          description: Eligibility recommendations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EligibilityResult"
+  /applications:
+    get:
+      operationId: getApplications
+      tags: [applications]
+      summary: List citizen applications
+      responses:
+        "200":
+          description: Application tracking items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Application"
+    post:
+      operationId: createApplication
+      tags: [applications]
+      summary: Start a service application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationInput"
+      responses:
+        "201":
+          description: Created application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+  /demo/run:
+    post:
+      operationId: runJudgeDemo
+      tags: [demo]
+      summary: Run the guided judge demo
+      responses:
+        "200":
+          description: Demo state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoState"
+  /admin/overview:
+    get:
+      operationId: getAdminOverview
+      tags: [admin]
+      summary: Get officer dashboard overview
+      responses:
+        "200":
+          description: Officer dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminOverview"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +229,173 @@ components:
           type: string
       required:
         - status
+    Activity:
+      type: object
+      required: [id, title, description, timestamp, type]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        timestamp: { type: string }
+        type:
+          type: string
+          enum: [profile, document, eligibility, application, verification]
+    DashboardSummary:
+      type: object
+      required: [citizenName, readinessScore, eligibleServices, uploadedDocuments, activeApplications, pendingActions, timeSavedMinutes]
+      properties:
+        citizenName: { type: string }
+        readinessScore: { type: integer, minimum: 0, maximum: 100 }
+        eligibleServices: { type: integer }
+        uploadedDocuments: { type: integer }
+        activeApplications: { type: integer }
+        pendingActions: { type: integer }
+        timeSavedMinutes: { type: integer }
+        profileCompletion: { type: integer, minimum: 0, maximum: 100 }
+    CitizenProfile:
+      type: object
+      required: [id, fullName, email, mobile, age, gender, aadhaarMasked, education, occupation, annualIncome, socialCategory, state, district, village, completion]
+      properties:
+        id: { type: string }
+        fullName: { type: string }
+        email: { type: string, format: email }
+        mobile: { type: string }
+        age: { type: integer }
+        gender: { type: string }
+        aadhaarMasked: { type: string }
+        education: { type: string }
+        occupation: { type: string }
+        annualIncome: { type: integer }
+        socialCategory: { type: string }
+        state: { type: string }
+        district: { type: string }
+        village: { type: string }
+        completion: { type: integer, minimum: 0, maximum: 100 }
+    ProfileUpdate:
+      type: object
+      properties:
+        fullName: { type: string }
+        mobile: { type: string }
+        age: { type: integer }
+        gender: { type: string }
+        education: { type: string }
+        occupation: { type: string }
+        annualIncome: { type: integer }
+        socialCategory: { type: string }
+        state: { type: string }
+        district: { type: string }
+        village: { type: string }
+    Document:
+      type: object
+      required: [id, name, category, status, verified, updatedAt, size]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        category: { type: string }
+        status:
+          type: string
+          enum: [verified, pending, missing]
+        verified: { type: boolean }
+        updatedAt: { type: string }
+        size: { type: string }
+        requiredFor:
+          type: array
+          items: { type: string }
+    DocumentInput:
+      type: object
+      required: [name, category]
+      properties:
+        name: { type: string }
+        category: { type: string }
+        size: { type: string }
+    GovernmentService:
+      type: object
+      required: [id, name, category, description, status, processingTime, requiredDocuments]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        category: { type: string }
+        description: { type: string }
+        status:
+          type: string
+          enum: [eligible, needs-action, ineligible]
+        processingTime: { type: string }
+        requiredDocuments:
+          type: array
+          items: { type: string }
+        reason: { type: string }
+        accent: { type: string }
+    EligibilityResult:
+      type: object
+      required: [serviceId, serviceName, status, reason, missingDocuments]
+      properties:
+        serviceId: { type: string }
+        serviceName: { type: string }
+        status:
+          type: string
+          enum: [eligible, needs-action, ineligible]
+        reason: { type: string }
+        missingDocuments:
+          type: array
+          items: { type: string }
+    Application:
+      type: object
+      required: [id, serviceName, reference, status, progress, updatedAt, steps]
+      properties:
+        id: { type: string }
+        serviceName: { type: string }
+        reference: { type: string }
+        status:
+          type: string
+          enum: [in-review, action-needed, approved, submitted]
+        progress: { type: integer, minimum: 0, maximum: 100 }
+        updatedAt: { type: string }
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationStep"
+    ApplicationStep:
+      type: object
+      required: [label, status]
+      properties:
+        label: { type: string }
+        status:
+          type: string
+          enum: [complete, current, upcoming]
+        timestamp: { type: ["string", "null"] }
+    ApplicationInput:
+      type: object
+      required: [serviceId]
+      properties:
+        serviceId: { type: string }
+    DemoState:
+      type: object
+      required: [active, step, message]
+      properties:
+        active: { type: boolean }
+        step: { type: integer }
+        message: { type: string }
+    AdminOverview:
+      type: object
+      required: [pendingReview, verificationRequests, approvedToday, averageProcessingTime, queue]
+      properties:
+        pendingReview: { type: integer }
+        verificationRequests: { type: integer }
+        approvedToday: { type: integer }
+        averageProcessingTime: { type: string }
+        queue:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminQueueItem"
+    AdminQueueItem:
+      type: object
+      required: [id, applicant, serviceName, priority, submittedAt]
+      properties:
+        id: { type: string }
+        applicant: { type: string }
+        serviceName: { type: string }
+        priority:
+          type: string
+          enum: [high, medium, low]
+        submittedAt: { type: string }
 

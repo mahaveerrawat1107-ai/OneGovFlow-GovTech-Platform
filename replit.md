@@ -1,6 +1,6 @@
-# [Project name]
+# OneGovFlow
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+OneGovFlow is a premium GovTech workspace that lets citizens create one reusable profile, manage verified documents, understand eligibility, and track government applications from one place.
 
 ## Run & Operate
 
@@ -10,6 +10,8 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/onegovflow run typecheck` — check the web app
+- `pnpm --filter @workspace/api-server run typecheck` — check the API server
 
 ## Stack
 

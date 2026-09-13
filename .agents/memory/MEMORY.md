@@ -1,0 +1,1 @@
+- [Supabase MCP runtime](supabase-mcp-runtime.md) — the selected Supabase MCP can provision/query data; browser persistence uses the Supabase Data API with a publishable key.

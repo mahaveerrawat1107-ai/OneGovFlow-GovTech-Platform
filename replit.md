@@ -24,23 +24,39 @@ OneGovFlow is a premium GovTech workspace that lets citizens create one reusable
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/onegovflow/src/contexts/language-context.tsx` — mandatory first-run language onboarding, Supabase preference sync, and shared translations
+- `artifacts/onegovflow/src/components/app-shell.tsx` — responsive citizen workspace shell and navigation
+- `artifacts/onegovflow/src/pages/app-pages.tsx` — routed landing, citizen, service, application, GovGuide, admin, and settings screens
+- `artifacts/onegovflow/src/index.css` — OneGovFlow design tokens, typography, motion, and theme
+- `artifacts/api-server/src/routes/onegovflow.ts` — MVP API routes
+- `artifacts/api-server/src/data/onegovflow.ts` — seeded MVP data and demo state
+- `lib/api-spec/openapi.yaml` — source of truth for typed API contracts
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The frontend is contract-first: user-facing API calls are represented in OpenAPI before hooks are generated.
+- The visual language adapts the supplied scholarship portal references into OneGovFlow branding without reusing SBI assets or identity.
+- The first MVP slice uses seeded data so the full demo remains usable while additional Supabase tables are wired.
+- Language onboarding is a global provider, not a page-level feature, so new screens inherit the selected language automatically.
+- Supabase stores `user_preferences.preferred_language`; local storage is only the fast client-side cache.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The current MVP includes a mandatory English/Hindi language onboarding screen, public landing page, login entry state, citizen dashboard, readiness score, document vault, profile editor, services marketplace, explainable eligibility results, application tracking, GovGuide workflow assistant, officer dashboard, settings, and Judge Demo Mode.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Treat this as the long-term OneGovFlow codebase for Team Inoverse and SIH26129.
+- Extend existing files and components; do not regenerate, rename, or replace working routes or components without an explicit request.
+- Keep the product premium, trustworthy, spacious, and production-oriented rather than visually generic.
+- Use React, TypeScript, Tailwind CSS, Framer Motion, and Supabase-compatible boundaries.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The app must never render the landing, login, or dashboard before a language has been selected.
+- Run API codegen after every OpenAPI change before importing new generated hooks or schemas.
+- Artifact workflows provide `PORT` and `BASE_PATH`; do not run the web app through a manually configured replacement workflow.
+- Do not silently choose between multiple Supabase connections; bind the connection the user selects.
 
 ## Pointers
 
